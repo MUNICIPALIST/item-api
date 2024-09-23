@@ -74,6 +74,26 @@ paths:
       tags:
       - items
   /items/{id}:
+    delete:
+      description: Удаляет существующий Item по ID
+      parameters:
+      - description: ID Item
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Удалить Item
+      tags:
+      - items
     get:
       description: Возвращает Item по заданному ID
       parameters:

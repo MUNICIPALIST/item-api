@@ -157,7 +157,6 @@ func UpdateItem(c *gin.Context) {
 // @Success      200  {object}  SuccessResponse
 // @Failure      404  {object}  ErrorResponse
 // @Router       /items/{id} [delete]
-
 func DeleteItem(c *gin.Context) {
 	id := c.Param("id")
 	var item Item

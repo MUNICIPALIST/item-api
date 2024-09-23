@@ -160,6 +160,36 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Удаляет существующий Item по ID",
+                "tags": [
+                    "items"
+                ],
+                "summary": "Удалить Item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Item",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.SuccessResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
