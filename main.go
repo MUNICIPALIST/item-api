@@ -7,7 +7,17 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"time"
 )
+
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+type SuccessResponse struct {
+	Message string `json:"message"`
+}
 
 type Item struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
@@ -27,6 +37,10 @@ func InitDB() {
 
 	if err != nil {
 		panic("Faild to connect to database!")
+	}
+
+	if err = DB.AutoMigrate(&Item{}); err != nil {
+		log.Fatalf("Не удалось выполнить миграцию базы данных: %v", err)
 	}
 
 	DB.AutoMigrate(&Item{})
@@ -64,12 +78,12 @@ func main() {
 // @Produce      json
 // @Param        item  body      Item  true  "Item для создания"
 // @Success      200   {object}  Item
-// @Failure      400   {object}  gin.H
+// @Failure      400   {object}  ErrorResponse
 // @Router       /items [post]
 func CreateItem(c *gin.Context) {
 	var item Item
 	if err := c.ShouldBindJSON(&item); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, ErrorResponse{Error: "Item not found"})
 		return
 	}
 	DB.Create(&item)
@@ -96,13 +110,13 @@ func GetItems(c *gin.Context) {
 // @Produce      json
 // @Param        id   path      int  true  "ID Item"
 // @Success      200  {object}  Item
-// @Failure      404  {object}  gin.H
+// @Failure      404  {object}  ErrorResponse
 // @Router       /items/{id} [get]
 func GetItem(c *gin.Context) {
 	id := c.Param("id")
 	var item Item
 	if err := DB.First(&item, id).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Item not found"})
+		c.JSON(404, ErrorResponse{Error: "Item not found"})
 		return
 	}
 	c.JSON(200, item)
@@ -116,19 +130,19 @@ func GetItem(c *gin.Context) {
 // @Produce      json
 // @Param        id    path      int   true  "ID Item"
 // @Param        item  body      Item  true  "Обновленные данные Item"
-// @Success      200   {object}  Item
-// @Failure      400   {object}  gin.H
-// @Failure      404   {object}  gin.H
+// @Success      200   {object}  SuccessResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      404   {object}  ErrorResponse
 // @Router       /items/{id} [put]
 func UpdateItem(c *gin.Context) {
 	id := c.Param("id")
 	var item Item
 	if err := DB.First(&item, id).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Item not found"})
+		c.JSON(404, ErrorResponse{Error: "Item not found"})
 		return
 	}
 	if err := c.ShouldBindJSON(&item); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, ErrorResponse{Error: "Item not found"})
 		return
 	}
 	DB.Save(&item)
@@ -140,16 +154,17 @@ func UpdateItem(c *gin.Context) {
 // @Description  Удаляет существующий Item по ID
 // @Tags         items
 // @Param        id   path      int  true  "ID Item"
-// @Success      200  {object}  gin.H
-// @Failure      404  {object}  gin.H
+// @Success      200  {object}  SuccessResponse
+// @Failure      404  {object}  ErrorResponse
 // @Router       /items/{id} [delete]
+
 func DeleteItem(c *gin.Context) {
 	id := c.Param("id")
 	var item Item
 	if err := DB.First(&item, id).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Item not found"})
+		c.JSON(404, ErrorResponse{Error: "Item not found"})
 		return
 	}
 	DB.Delete(&item)
-	c.JSON(200, gin.H{"message": "Item deleted"})
+	c.JSON(200, SuccessResponse{Message: "Item deleted"})
 }

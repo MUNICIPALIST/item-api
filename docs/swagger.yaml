@@ -1,0 +1,136 @@
+basePath: /
+definitions:
+  main.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  main.Item:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    required:
+    - name
+    - price
+    type: object
+  main.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Это API для управления предметами.
+  title: Item API
+  version: "1.0"
+paths:
+  /items:
+    get:
+      description: Возвращает список всех Items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Item'
+            type: array
+      summary: Получить список всех Items
+      tags:
+      - items
+    post:
+      consumes:
+      - application/json
+      description: Создает новый Item
+      parameters:
+      - description: Item для создания
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/main.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Item'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Создать новый Item
+      tags:
+      - items
+  /items/{id}:
+    get:
+      description: Возвращает Item по заданному ID
+      parameters:
+      - description: ID Item
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Item'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Получить Item по ID
+      tags:
+      - items
+    put:
+      consumes:
+      - application/json
+      description: Обновляет данные существующего Item по ID
+      parameters:
+      - description: ID Item
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленные данные Item
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/main.Item'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Обновить существующий Item
+      tags:
+      - items
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
